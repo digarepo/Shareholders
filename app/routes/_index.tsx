@@ -46,46 +46,105 @@ export const action: ActionFunction = async ({
 }) => {
   const formData = await request.formData();
   const intent = formData.get("intent");
-  const dp_id = formData.get("dp_id") as string;
-  const full_name = formData.get("full_name") as string;
-  const share_amount = formData.get("share_amount") as string;
+  const fn_id = formData.get("fn_id") as string;
+  const name_amharic = formData.get("name_amharic") as string;
+  const name_english = formData.get("name_english") as string;
+  const city = formData.get("city") as string;
+  const subcity = formData.get("subcity") as string;
+  const wereda = formData.get("wereda") as string;
+  const house_number = formData.get("house_number") as string;
+  const phone_1 = formData.get("phone_1") as string;
+  const phone_2 = formData.get("phone_2") as string;
+  const email = formData.get("email") as string;
+  const share_will = formData.get("share_will") as string;
+  const nationality = formData.get("nationality") as string;
+  const receipt_number = formData.get("receipt_number") as string;
+  const attendance_2023_dec_24 = formData.get("attendance_2023_dec_24") as string;
+  const certificate_number = formData.get("certificate_number") as string;
+  const taken_certificate = formData.get("taken_certificate") as string;
+  const share_price = formData.get("share_price") as string;
+  const error_share = formData.get("error_share") as string;
+  const error_form = formData.get("error_form") as string;
+  const error_bank_slip = formData.get("error_bank_slip") as string;
+  const comment_medina = formData.get("comment_medina") as string;
+  const general_comment = formData.get("general_comment") as string;
+  const version = formData.get("version") as string;
 
   if (intent === "create" || intent === "update") {
     // Validate input
-    if (!dp_id || dp_id.length !== 6) {
-      return json({ error: "DP ID must be exactly 6 characters" }, { status: 400 });
+    if (!fn_id || fn_id.trim().length !== 6) {
+      return json({ error: "FN ID must be exactly 6 characters" }, { status: 400 });
     }
-    if (!full_name?.trim()) {
-      return json({ error: "Full name is required" }, { status: 400 });
+    if (!name_amharic || name_amharic.trim().length === 0) {
+      return json({ error: "Name in Amharic is required" }, { status: 400 });
     }
-    const amount = parseFloat(share_amount);
-    if (isNaN(amount) || amount < 0) {
-      return json({ error: "Valid share amount is required" }, { status: 400 });
+    if (!name_english || name_english.trim().length === 0) {
+      return json({ error: "Name in English is required" }, { status: 400 });
+    }
+    if (!city || city.trim().length === 0) {
+      return json({ error: "City is required" }, { status: 400 });
+    }
+    if (!subcity || subcity.trim().length === 0) {
+      return json({ error: "Subcity is required" }, { status: 400 });
+    }
+    if (!wereda || wereda.trim().length === 0) {
+      return json({ error: "Wereda is required" }, { status: 400 });
+    }
+    if (!house_number || house_number.trim().length === 0) {
+      return json({ error: "House number is required" }, { status: 400 });
+    }
+    if (!phone_1 || phone_1.trim().length === 0) {
+      return json({ error: "Phone 1 is required" }, { status: 400 });
+    }
+    if (!email || email.trim().length === 0) {
+      return json({ error: "Email is required" }, { status: 400 });
+    }
+    if (!share_will || isNaN(share_will)) {
+      return json({ error: "Valid share will is required" }, { status: 400 });
+    }
+    if (!nationality || nationality.trim().length === 0) {
+      return json({ error: "Nationality is required" }, { status: 400 });
+    }
+    if (!receipt_number || receipt_number.trim().length === 0) {
+      return json({ error: "Receipt number is required" }, { status: 400 });
+    }
+    if (!attendance_2023_dec_24 || isNaN(attendance_2023_dec_24)) {
+      return json({ error: "Valid attendance is required" }, { status: 400 });
+    }
+    if (!certificate_number || certificate_number.trim().length === 0) {
+      return json({ error: "Certificate number is required" }, { status: 400 });
+    }
+    if (!share_price || isNaN(share_price)) {
+      return json({ error: "Valid share price is required" }, { status: 400 });
+    }
+    if (!version || isNaN(version)) {
+      return json({ error: "Valid version is required" }, { status: 400 });
     }
 
     if (intent === "create") {
       // Check if shareholder already exists
-      const existing = await query("SELECT dp_id FROM shareholders WHERE dp_id = ?", [dp_id]);
+      const existing = await query("SELECT fn_id FROM shareholders WHERE fn_id = ?", [fn_id]);
       if (existing.length > 0) {
-        return json({ error: "Shareholder with this DP ID already exists" }, { status: 400 });
+        return json({ error: "Shareholder with this FN ID already exists" }, { status: 400 });
       }
       
+      
       await query(
-        "INSERT INTO shareholders (dp_id, full_name, share_amount) VALUES (?, ?, ?)",
-        [dp_id, full_name.trim(), amount]
+        "INSERT INTO shareholders (fn_id, name_amharic, name_english, city, subcity, wereda, house_number, phone_1, phone_2, email, share_will, nationality, receipt_number, attendance_2023_dec_24, certificate_number, taken_certificate, share_price, error_share, error_form, error_bank_slip, comment_medina, general_comment, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [fn_id, name_amharic.trim(), name_english.trim(), city.trim(), subcity.trim(), wereda.trim(), house_number.trim(), phone_1.trim(), phone_2.trim(), email.trim(), share_will, nationality.trim(), receipt_number.trim(), attendance_2023_dec_24, certificate_number.trim(), taken_certificate, share_price, error_share.trim(), error_form.trim(), error_bank_slip.trim(), comment_medina.trim(), general_comment.trim(), version]
       );
     } else {
       // Update existing shareholder
       await query(
-        "UPDATE shareholders SET full_name = ?, share_amount = ? WHERE dp_id = ?",
-        [full_name.trim(), amount, dp_id]
+        "UPDATE shareholders SET name_amharic = ?, name_english = ?, city = ?, subcity = ?, wereda = ?, house_number = ?, phone_1 = ?, phone_2 = ?, email = ?, share_will = ?, nationality = ?, receipt_number = ?, attendance_2023_dec_24 = ?, certificate_number = ?, taken_certificate = ?, share_price = ?, error_share = ?, error_form = ?, error_bank_slip = ?, comment_medina = ?, general_comment = ?, version = ? WHERE fn_id = ?",
+        [name_amharic.trim(), name_english.trim(), city.trim(), subcity.trim(), wereda.trim(), house_number.trim(), phone_1.trim(), phone_2.trim(), email.trim(), share_will, nationality.trim(), receipt_number.trim(), attendance_2023_dec_24, certificate_number.trim(), taken_certificate, share_price, error_share.trim(), error_form.trim(), error_bank_slip.trim(), comment_medina.trim(), general_comment.trim(), version, fn_id]
       );
     }
   } else if (intent === "delete") {
-    if (!dp_id) {
-      return json({ error: "DP ID is required" }, { status: 400 });
+    if (!fn_id) {
+      return json({ error: "FN ID is required" }, { status: 400 });
     }
-    await query("DELETE FROM shareholders WHERE dp_id = ?", [dp_id]);
+    await query("DELETE FROM shareholders WHERE fn_id = ?", [fn_id]);
   }
 
   // Return a success response

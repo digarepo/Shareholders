@@ -1,5 +1,25 @@
 CREATE TABLE shareholders (
-    dp_id VARCHAR(6) NOT NULL PRIMARY KEY,
-    full_name VARCHAR(100) NOT NULL,
-    share_amount DECIMAL(10, 2) NOT NULL
+    fn_id VARCHAR(6) NOT NULL,
+    name_amharic VARCHAR(100) NOT NULL,
+    name_english VARCHAR(100) NOT NULL,
+    city VARCHAR(100) NOT NULL,
+    subcity VARCHAR(100) NOT NULL,
+    wereda VARCHAR(100) NOT NULL,
+    house_number VARCHAR(100) NOT NULL,
+    phone_1 VARCHAR(15) NOT NULL,
+    phone_2 VARCHAR(15) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    share_will DOUBLE NOT NULL,
+    nationality VARCHAR(100) NOT NULL,
+    receipt_number VARCHAR(100) NOT NULL,
+    attendance_2023_dec_24 TINYINT(1) NOT NULL,
+    certificate_number VARCHAR(100) NOT NULL,
+    taken_certificate  TINYINT(1) NOT NULL,
+    share_price DECIMAL(10, 2) NOT NULL,
+    error_share VARCHAR(100) NOT NULL,
+    error_form VARCHAR(100) NOT NULL,
+    error_bank_slip VARCHAR(100) NOT NULL,
+    comment_medina VARCHAR(100) NOT NULL,
+    general_comment VARCHAR(100) NOT NULL,
+    version INT(11) NOT NULL
 );

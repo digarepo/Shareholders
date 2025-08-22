@@ -41,9 +41,29 @@ export async function query<T = unknown>(
 
 // Type definitions for better maintainability
 export interface Shareholder {
-  dp_id: string;
-  full_name: string;
-  share_amount: number;
+  fn_id: string;
+  name_amharic: string;
+  name_english: string;
+  city: string;
+  subcity: string;
+  wereda: string;
+  house_number: string;
+  phone_1: string;
+  phone_2: string;
+  email: string;
+  share_will: number;
+  nationality: string;
+  receipt_number: string;
+  attendance_2023_dec_24: boolean;
+  certificate_number: string;
+  taken_certificate: boolean;
+  share_price: number;
+  error_share: string;
+  error_form: string;
+  error_bank_slip: string;
+  comment_medina: string;
+  general_comment: string;
+  version: number;
 }
 
 // Example usage with proper typing:
