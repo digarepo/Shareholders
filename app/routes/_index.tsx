@@ -206,9 +206,9 @@ export default function Index() {
               <h3 className="text-lg font-semibold text-gray-200 mb-4">Shareholder Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">DP ID</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">FN ID (6 chars)</label>
                   <input
-                    name="dp_id"
+                    name="fn_id"
                     placeholder="6 characters"
                     maxLength={6}
                     className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
@@ -216,22 +216,46 @@ export default function Index() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Name (Amharic)</label>
                   <input
-                    name="full_name"
-                    placeholder="Shareholder's full name"
+                    name="name_amharic"
+                    placeholder="Name in Amharic"
                     className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Share Amount</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Name (English)</label>
                   <input
-                    name="share_amount"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    placeholder="0.00"
+                    name="name_english"
+                    placeholder="Name in English"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">City</label>
+                  <input
+                    name="city"
+                    placeholder="City"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Subcity</label>
+                  <input
+                    name="subcity"
+                    placeholder="Subcity"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Wereda</label>
+                  <input
+                    name="wereda"
+                    placeholder="Wereda"
                     className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                     required
                   />
@@ -282,36 +306,58 @@ export default function Index() {
                   <fetcher.Form method="post" className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">DP ID</label>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">FN ID</label>
                         <input
-                          name="dp_id"
-                          defaultValue={shareholder.dp_id}
+                          name="fn_id"
+                          defaultValue={shareholder.fn_id}
                           className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Full Name</label>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Name (Amharic)</label>
                         <input
-                          name="full_name"
-                          defaultValue={shareholder.full_name}
+                          name="name_amharic"
+                          defaultValue={shareholder.name_amharic}
                           className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                           required
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-300 mb-1">Share Amount</label>
-                        <div className="flex">
-                          <input
-                            name="share_amount"
-                            type="number"
-                            step="0.01"
-                            min="0"
-                            defaultValue={shareholder.share_amount}
-                            className="flex-1 p-2 bg-gray-600 border border-gray-500 text-white rounded-l-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                            required
-                          />
-                        </div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Name (English)</label>
+                        <input
+                          name="name_english"
+                          defaultValue={shareholder.name_english}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">City</label>
+                        <input
+                          name="city"
+                          defaultValue={shareholder.city}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Subcity</label>
+                        <input
+                          name="subcity"
+                          defaultValue={shareholder.subcity}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Wereda</label>
+                        <input
+                          name="wereda"
+                          defaultValue={shareholder.wereda}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
                       </div>
                     </div>
 
