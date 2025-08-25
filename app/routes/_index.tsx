@@ -29,12 +29,12 @@ export const meta: MetaFunction = () => {
 // Loader function that runs on the server to fetch data
 export const loader: LoaderFunction = async () => {
   try {
-    // Query all shareholders from the database
-    const shareholders = await query<Shareholder>("SELECT * FROM shareholders ORDER BY full_name");
+    // Query all shareholders from the database,
+    const shareholders = await query<Shareholder>("SELECT * FROM shareholders");
     return json(shareholders);
   } catch (error) {
     console.error("Loader error:", error);
-    return json([], { status: 500 });
+    return json([]);
   }
 };
 
@@ -44,8 +44,11 @@ export const action: ActionFunction = async ({
 }: {
   request: Request;
 }) => {
+ 
   const formData = await request.formData();
+  // const intent = formData.get("intent");
   const intent = formData.get("intent");
+  // const fn_id = formData.get("fn_id") as string;
   const fn_id = formData.get("fn_id") as string;
   const name_amharic = formData.get("name_amharic") as string;
   const name_english = formData.get("name_english") as string;
@@ -70,7 +73,8 @@ export const action: ActionFunction = async ({
   const general_comment = formData.get("general_comment") as string;
   const version = formData.get("version") as string;
 
-  if (intent === "create" || intent === "update") {
+  //handle different actions
+  if (intent === "create" ) {
     // Validate input
     if (!fn_id || fn_id.trim().length !== 6) {
       return json({ error: "FN ID must be exactly 6 characters" }, { status: 400 });
@@ -133,7 +137,7 @@ export const action: ActionFunction = async ({
         "INSERT INTO shareholders (fn_id, name_amharic, name_english, city, subcity, wereda, house_number, phone_1, phone_2, email, share_will, nationality, receipt_number, attendance_2023_dec_24, certificate_number, taken_certificate, share_price, error_share, error_form, error_bank_slip, comment_medina, general_comment, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [fn_id, name_amharic.trim(), name_english.trim(), city.trim(), subcity.trim(), wereda.trim(), house_number.trim(), phone_1.trim(), phone_2.trim(), email.trim(), share_will, nationality.trim(), receipt_number.trim(), attendance_2023_dec_24, certificate_number.trim(), taken_certificate, share_price, error_share.trim(), error_form.trim(), error_bank_slip.trim(), comment_medina.trim(), general_comment.trim(), version]
       );
-    } else {
+    } else if (intent === "update") {
       // Update existing shareholder
       await query(
         "UPDATE shareholders SET name_amharic = ?, name_english = ?, city = ?, subcity = ?, wereda = ?, house_number = ?, phone_1 = ?, phone_2 = ?, email = ?, share_will = ?, nationality = ?, receipt_number = ?, attendance_2023_dec_24 = ?, certificate_number = ?, taken_certificate = ?, share_price = ?, error_share = ?, error_form = ?, error_bank_slip = ?, comment_medina = ?, general_comment = ?, version = ? WHERE fn_id = ?",
@@ -141,20 +145,23 @@ export const action: ActionFunction = async ({
       );
     }
   } else if (intent === "delete") {
+    // delete a shareholder
+    // use original fn_id
     if (!fn_id) {
       return json({ error: "FN ID is required" }, { status: 400 });
     }
     await query("DELETE FROM shareholders WHERE fn_id = ?", [fn_id]);
   }
 
-  // Return a success response
-  return json({ success: true });
-};
+    // Return a success response
+    console.log('Action completed successfully');
+    return json({ success: true });
+  };
 
 // Main component that renders the page
 export default function Index() {
   // Load the shareholders data using the loader
-  const shareholders = useLoaderData<Shareholder[]>();
+  const shareholders = useLoaderData<typeof loader>();
   // Get action data for error handling
   const actionData = useActionData<typeof action>();
   // Initialize fetcher for form submissions
@@ -191,10 +198,10 @@ export default function Index() {
           <fetcher.Form
             ref={formRef}
             method="post"
-            onSubmit={() => {
-              setTimeout(() => {
-                revalidator.revalidate();
-              }, 500);
+            action="?index"
+            onSubmit={(e) => {
+              console.log('Form submitted');
+              // This will be handled by the fetcher
             }}
           >
             <div className="mb-6">
@@ -260,6 +267,172 @@ export default function Index() {
                     required
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">House Number</label>
+                  <input
+                    name="house_number"
+                    placeholder="House Number"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Primary Phone</label>
+                  <input
+                    name="phone_1"
+                    type="tel"
+                    placeholder="+251911223344"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Secondary Phone</label>
+                  <input
+                    name="phone_2"
+                    type="tel"
+                    placeholder="+251911223345 (Optional)"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                  <input
+                    name="email"
+                    type="email"
+                    placeholder="shareholder@example.com"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Share Will</label>
+                  <input
+                    name="share_will"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Nationality</label>
+                  <input
+                    name="nationality"
+                    placeholder="Ethiopian"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Receipt Number</label>
+                  <input
+                    name="receipt_number"
+                    placeholder="RCPT-001"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="attendance_2023_dec_24"
+                    id="attendance"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded"
+                  />
+                  <label htmlFor="attendance" className="ml-2 block text-sm text-gray-300">
+                    Attended Dec 24, 2023
+                  </label>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Certificate Number</label>
+                  <input
+                    name="certificate_number"
+                    placeholder="CERT-001"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="taken_certificate"
+                    id="taken_certificate"
+                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded"
+                  />
+                  <label htmlFor="taken_certificate" className="ml-2 block text-sm text-gray-300">
+                    Certificate Taken
+                  </label>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Share Price</label>
+                  <input
+                    name="share_price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Share Error</label>
+                    <input
+                      name="error_share"
+                      placeholder="Share error details"
+                      className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Form Error</label>
+                    <input
+                      name="error_form"
+                      placeholder="Form error details"
+                      className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Bank Slip Error</label>
+                    <input
+                      name="error_bank_slip"
+                      placeholder="Bank slip error details"
+                      className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    />
+                  </div>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Medina Comment</label>
+                  <textarea
+                    name="comment_medina"
+                    rows={2}
+                    placeholder="Comments from Medina"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="block text-sm font-medium text-gray-300 mb-2">General Comment</label>
+                  <textarea
+                    name="general_comment"
+                    rows={2}
+                    placeholder="Additional notes"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Version</label>
+                  <input
+                    name="version"
+                    type="number"
+                    min="1"
+                    defaultValue="1"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
@@ -273,14 +446,38 @@ export default function Index() {
             )}
 
             {/* Submit Button */}
-            <button
-              type="submit"
-              name="intent"
-              value="create"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
-            >
-              Add Shareholder
-            </button>
+            <div className="mt-6">
+              <button
+                type="submit"
+                name="intent"
+                value="create"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors"
+                disabled={fetcher.state !== "idle"}
+              >
+                {fetcher.state === "submitting" ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Adding...
+                  </span>
+                ) : (
+                  'Add Shareholder'
+                )}
+              </button>
+              {actionData?.error && (
+                <div className="mt-4 p-4 bg-red-900/50 border border-red-800 text-red-200 rounded-lg">
+                  <h3 className="font-bold">Error: {actionData.error}</h3>
+                  {actionData.details && (
+                    <div className="mt-2 text-sm opacity-75">
+                      <p>Details: {actionData.details}</p>
+                    </div>
+                  )}
+                  <p className="mt-2 text-sm">Please check the console for more details and try again.</p>
+                </div>
+              )}
+            </div>
           </fetcher.Form>
         </div>
 
@@ -359,6 +556,175 @@ export default function Index() {
                           required
                         />
                       </div>
+                     
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">House Number</label>
+                        <input
+                          name="house_number"
+                          defaultValue={shareholder.house_number}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Primary Phone</label>
+                        <input
+                          name="phone_1"
+                          defaultValue={shareholder.phone_1}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Secondary Phone</label>
+                        <input
+                          name="phone_2"
+                          defaultValue={shareholder.phone_2}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Email</label>
+                        <input
+                          name="email"
+                          type="email"
+                          defaultValue={shareholder.email}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Share Will</label>
+                        <input
+                          name="share_will"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          defaultValue={shareholder.share_will}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Nationality</label>
+                        <input
+                          name="nationality"
+                          defaultValue={shareholder.nationality}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Receipt Number</label>
+                        <input
+                          name="receipt_number"
+                          defaultValue={shareholder.receipt_number}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          name="attendance_2023_dec_24"
+                          defaultChecked={Boolean(shareholder.attendance_2023_dec_24)}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded"
+                        />
+                        <label className="ml-2 block text-sm text-gray-300">Attended Dec 24, 2023</label>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Certificate Number</label>
+                        <input
+                          name="certificate_number"
+                          defaultValue={shareholder.certificate_number}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      
+                      <div className="flex items-center">
+                        <input
+                          type="checkbox"
+                          name="taken_certificate"
+                          defaultChecked={Boolean(shareholder.taken_certificate)}
+                          className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded"
+                        />
+                        <label className="ml-2 block text-sm text-gray-300">Certificate Taken</label>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Share Price</label>
+                        <input
+                          name="share_price"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          defaultValue={shareholder.share_price}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Share Error</label>
+                        <input
+                          name="error_share"
+                          defaultValue={shareholder.error_share}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Form Error</label>
+                        <input
+                          name="error_form"
+                          defaultValue={shareholder.error_form}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                        />
+                      </div>
+                      
+
+                      <div>
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Bank Slip Error</label>
+                        <input
+                          name="error_bank_slip"
+                          defaultValue={shareholder.error_bank_slip}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                        />
+                      </div>
+
+
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Medina Comment</label>
+                        <textarea
+                          name="comment_medina"
+                          defaultValue={shareholder.comment_medina}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                        />
+                      </div>
+                      
+
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Medina Comment</label>
+                        <textarea
+                          name="comment_medina"
+                          defaultValue={shareholder.comment_medina}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                        />
+                      </div>
+
+                      {/* version */}
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-gray-300 mb-1">Version</label>
+                        <input
+                          name="version"
+                          defaultValue={shareholder.version}
+                          className="w-full p-2 bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                        />
+                      </div>
+
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-4 border-t border-gray-600">

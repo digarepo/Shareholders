@@ -1,4 +1,4 @@
-CREATE TABLE shareholders (
+CREATE TABLE IF NOT EXISTS shareholders (
     fn_id VARCHAR(6) NOT NULL,
     name_amharic VARCHAR(100) NOT NULL,
     name_english VARCHAR(100) NOT NULL,
@@ -14,12 +14,13 @@ CREATE TABLE shareholders (
     receipt_number VARCHAR(100) NOT NULL,
     attendance_2023_dec_24 TINYINT(1) NOT NULL,
     certificate_number VARCHAR(100) NOT NULL,
-    taken_certificate  TINYINT(1) NOT NULL,
+    taken_certificate TINYINT(1) NOT NULL,
     share_price DECIMAL(10, 2) NOT NULL,
     error_share VARCHAR(100) NOT NULL,
     error_form VARCHAR(100) NOT NULL,
     error_bank_slip VARCHAR(100) NOT NULL,
     comment_medina VARCHAR(100) NOT NULL,
     general_comment VARCHAR(100) NOT NULL,
-    version INT(11) NOT NULL
-);
+    version INT(11) NOT NULL,
+    PRIMARY KEY (fn_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
