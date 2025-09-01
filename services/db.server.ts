@@ -21,9 +21,15 @@ export async function query<T = unknown>(
 ): Promise<T[]> {
   let conn;
   try {
+    console.log('Getting database connection...');
     conn = await pool.getConnection();
+    console.log('Executing query:', sql);
+    console.log('With parameters:', params);
+    const startTime = Date.now();
     const results: T[] = await conn.query(sql, params);
-    console.log(`Executed query: ${sql}`);
+    const endTime = Date.now();
+    console.log(`Query executed in ${endTime - startTime}ms`);
+    console.log(`Returned ${results.length} rows`);
     return results;
   } catch (error) {
     console.error("Database query error:", error);
@@ -46,25 +52,7 @@ export interface Shareholder {
   name_english: string;
   city: string;
   subcity: string;
-  wereda: string;
-  house_number: string;
-  phone_1: string;
-  phone_2: string;
-  email: string;
-  share_will: number;
-  nationality: string;
-  receipt_number: string;
-  attendance_2023_dec_24: boolean;
-  certificate_number: string;
-  taken_certificate: boolean;
-  share_price: number;
-  error_share: string;
-  error_form: string;
-  error_bank_slip: string;
-  comment_medina: string;
-  general_comment: string;
-  version: number;
 }
 
 // Example usage with proper typing:
-// const statements = await query<Statement>("SELECT * FROM statements");
+// const shareholders = await query<Shareholder>("SELECT * FROM shareholders");
