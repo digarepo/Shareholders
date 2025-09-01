@@ -52,6 +52,9 @@ export const action: ActionFunction = async ({
   const name_english = formData.get("name_english");
   const city = formData.get("city");
   const subcity = formData.get("subcity");
+  const wereda = formData.get("wereda");
+  const house_number = formData.get("house_number");
+  const phone_1 = formData.get("phone_1");
 
   // Handle different actions based on the intent
   if (intent === "create") {
@@ -71,6 +74,15 @@ export const action: ActionFunction = async ({
     if (!subcity || subcity.toString().length === 0) {
       return json({ error: "Valid subcity is required" }, { status: 400 });
     }
+    if (!wereda || wereda.toString().length === 0) {
+      return json({ error: "Valid wereda is required" }, { status: 400 });
+    }
+    if (!house_number || house_number.toString().length === 0) {
+      return json({ error: "Valid house_number is required" }, { status: 400 });
+    }
+    if (!phone_1 || phone_1.toString().length === 0) {
+      return json({ error: "Valid phone_1 is required" }, { status: 400 });
+    }
     // Check for duplicate fn_id
     const existing = await query<Shareholder>(
       "SELECT * FROM shareholders WHERE fn_id = ?",
@@ -81,25 +93,31 @@ export const action: ActionFunction = async ({
     }
 
     await query(
-      "INSERT INTO shareholders (fn_id, name_amharic, name_english, city, subcity) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO shareholders (fn_id, name_amharic, name_english, city, subcity, wereda, house_number, phone_1) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [
         fn_id?.toString().trim(),
         name_amharic?.toString().trim(),
         name_english?.toString().trim(),
         city?.toString().trim(),
         subcity?.toString().trim(),
+        wereda?.toString().trim(),
+        house_number?.toString().trim(),
+        phone_1?.toString().trim(),
       ]
     );
   } else if (intent === "update") {
     // Update an existing shareholder
     await query(
-      "UPDATE shareholders SET fn_id = ?, name_amharic = ?, name_english = ?, city = ?, subcity = ? WHERE fn_id = ?",
+      "UPDATE shareholders SET fn_id = ?, name_amharic = ?, name_english = ?, city = ?, subcity = ?, wereda = ?, house_number = ?, phone_1 = ? WHERE fn_id = ?",
       [
         fn_id as string,
         name_amharic as string,
         name_english as string,
         city as string,
         subcity as string,
+        wereda as string,
+        house_number as string,
+        phone_1 as string,
         old_fn_id as string,
       ]
     );
@@ -150,9 +168,7 @@ export default function Index() {
           <h1 className="text-3xl font-bold text-white mb-2">
             Shareholders Manager
           </h1>
-          <p className="text-gray-400">
-            Create and manage your shareholders
-          </p>
+          <p className="text-gray-400">Create and manage your shareholders</p>
         </div>
 
         {/* Create Shareholder Form */}
@@ -234,6 +250,39 @@ export default function Index() {
                     required
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Wereda
+                  </label>
+                  <input
+                    name="wereda"
+                    placeholder="Enter Wereda"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    House Number
+                  </label>
+                  <input
+                    name="house_number"
+                    placeholder="Enter House Number"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Phone 1
+                  </label>
+                  <input
+                    name="phone_1"
+                    placeholder="Enter Phone 1"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
@@ -281,7 +330,7 @@ export default function Index() {
             <div className="space-y-6">
               {shareholders.map((shareholder: Shareholder) => (
                 <div
-                  key={shareholder.id} 
+                  key={shareholder.id}
                   className="border border-gray-600 rounded-lg p-6 bg-gray-700"
                 >
                   <fetcher.Form method="post">
@@ -296,7 +345,8 @@ export default function Index() {
                             {shareholder.name_amharic}
                           </h3>
                           <p className="text-sm text-gray-400">
-                            {shareholder.name_english} - {shareholder.city}, {shareholder.subcity}
+                            {shareholder.name_english} - {shareholder.city},{" "}
+                            {shareholder.subcity}
                           </p>
                         </div>
                       </div>
@@ -304,12 +354,13 @@ export default function Index() {
                     </div>
 
                     {/* Editable Fields Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                    <div className="grid grid-cols-1 gap-4 mb-6">
                       {/* Basic Info */}
-                      <div className="space-y-3">
-                        <h4 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">
-                          Basic Info
-                        </h4>
+                      <h4 className="text-sm font-semibold text-gray-300 uppercase tracking-wide">
+                        Basic Info
+                      </h4>
+
+                      <div className="space-y-3 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                           <label className="block text-xs font-medium text-gray-400 mb-1">
                             FN_ID
@@ -361,6 +412,39 @@ export default function Index() {
                           <input
                             name="subcity"
                             defaultValue={shareholder.subcity}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Wereda
+                          </label>
+                          <input
+                            name="wereda"
+                            defaultValue={shareholder.wereda}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            House Number
+                          </label>
+                          <input
+                            name="house_number"
+                            defaultValue={shareholder.house_number}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Phone Number-1
+                          </label>
+                          <input
+                            name="phone_1"
+                            defaultValue={shareholder.phone_1}
                             className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                             required
                           />

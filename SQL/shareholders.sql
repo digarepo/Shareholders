@@ -4,5 +4,8 @@ CREATE TABLE IF NOT EXISTS shareholders (
     name_english VARCHAR(100) NOT NULL,
     city VARCHAR(100) NOT NULL,
     subcity VARCHAR(100) NOT NULL,
+    wereda VARCHAR(100) NOT NULL,
+    house_number VARCHAR(100) NOT NULL,
+    phone_1 VARCHAR(15) NOT NULL,
     PRIMARY KEY (fn_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

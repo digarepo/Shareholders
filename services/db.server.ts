@@ -52,6 +52,9 @@ export interface Shareholder {
   name_english: string;
   city: string;
   subcity: string;
+  wereda: string;
+  house_number: string;
+  phone_1: string;
 }
 
 // Example usage with proper typing:
