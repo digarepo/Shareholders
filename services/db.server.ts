@@ -59,6 +59,17 @@ export interface Shareholder {
   email: string;
   share_will: number;
   nationality: string;
+  receipt_number: string;
+  attendance_2023_dec_24: boolean;
+  certificate_number: string;
+  taken_certificate: boolean;
+  share_price: number;
+  error_share: string;
+  error_form: string;
+  error_bank_slip: string;
+  comment_medina: string;
+  general_comment: string;
+  version: number;
 }
 
 // Example usage with proper typing:

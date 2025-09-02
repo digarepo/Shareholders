@@ -59,6 +59,17 @@ export const action: ActionFunction = async ({
   const email = formData.get("email");
   const share_will = formData.get("share_will");
   const nationality = formData.get("nationality");
+  const receipt_number = formData.get("receipt_number");
+  const attendance_2023_dec_24 = formData.get("attendance_2023_dec_24");
+  const certificate_number = formData.get("certificate_number");
+  const taken_certificate = formData.get("taken_certificate");
+  const share_price = formData.get("share_price");
+  const error_share = formData.get("error_share");
+  const error_form = formData.get("error_form");
+  const error_bank_slip = formData.get("error_bank_slip");
+  const comment_medina = formData.get("comment_medina");
+  const general_comment = formData.get("general_comment");
+  const version = formData.get("version");
 
   // Handle different actions based on the intent
   if (intent === "create") {
@@ -99,6 +110,21 @@ export const action: ActionFunction = async ({
     if (!nationality || nationality.toString().length === 0) {
       return json({ error: "Valid nationality is required" }, { status: 400 });
     }
+    if (!receipt_number || receipt_number.toString().length === 0) {
+      return json({ error: "Valid receipt_number is required" }, { status: 400 });
+    }
+    if (!attendance_2023_dec_24 || isNaN(Number(attendance_2023_dec_24))) {
+      return json({ error: "Valid attendance_2023_dec_24 is required" }, { status: 400 });
+    }
+    if (!certificate_number || certificate_number.toString().length === 0) {
+      return json({ error: "Valid certificate_number is required" }, { status: 400 });
+    }
+    if (!taken_certificate || isNaN(Number(taken_certificate))) {
+      return json({ error: "Valid taken_certificate is required" }, { status: 400 });
+    }
+    if (!share_price || isNaN(Number(share_price))) {
+      return json({ error: "Valid share_price is required" }, { status: 400 });
+    }
 
     // Check for duplicate fn_id
     const existing = await query<Shareholder>(
@@ -110,7 +136,7 @@ export const action: ActionFunction = async ({
     }
 
     await query(
-      "INSERT INTO shareholders (fn_id, name_amharic, name_english, city, subcity, wereda, house_number, phone_1) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO shareholders (fn_id, name_amharic, name_english, city, subcity, wereda, house_number, phone_1, phone_2, email, share_will, nationality, receipt_number, attendance_2023_dec_24, certificate_number, taken_certificate, share_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         fn_id?.toString().trim(),
         name_amharic?.toString().trim(),
@@ -123,13 +149,18 @@ export const action: ActionFunction = async ({
         phone_2?.toString().trim(),
         email?.toString().trim(),
         share_will?.toString().trim(),
-        nationality?.toString().trim()
+        nationality?.toString().trim(),
+        receipt_number?.toString().trim(),
+        attendance_2023_dec_24?.toString().trim(),
+        certificate_number?.toString().trim(),
+        taken_certificate?.toString().trim(),
+        share_price?.toString().trim(),
       ]
     );
   } else if (intent === "update") {
     // Update an existing shareholder
     await query(
-      "UPDATE shareholders SET fn_id = ?, name_amharic = ?, name_english = ?, city = ?, subcity = ?, wereda = ?, house_number = ?, phone_1 = ?, phone_2 = ?, email = ?, share_will = ?, nationality = ? WHERE fn_id = ?",
+      "UPDATE shareholders SET fn_id = ?, name_amharic = ?, name_english = ?, city = ?, subcity = ?, wereda = ?, house_number = ?, phone_1 = ?, phone_2 = ?, email = ?, share_will = ?, nationality = ?, receipt_number = ?, attendance_2023_dec_24 = ?, certificate_number = ?, taken_certificate = ?, share_price = ? WHERE fn_id = ?",
       [
         fn_id as string,
         name_amharic as string,
@@ -143,6 +174,11 @@ export const action: ActionFunction = async ({
         email as string,
         share_will as string,
         nationality as string,
+        receipt_number as string,
+        attendance_2023_dec_24 as string,
+        certificate_number as string,
+        taken_certificate as string,
+        share_price as string,
         old_fn_id as string,
       ]
     );
@@ -355,6 +391,64 @@ export default function Index() {
                     required
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Receipt Number
+                  </label>
+                  <input
+                    name="receipt_number"
+                    placeholder="Enter Receipt Number"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    name="attendance_2023_dec_24"
+                    type="checkbox"
+                    className="w-4 h-4 bg-gray-700 border border-gray-600 text-blue-400 rounded focus:ring-2 focus:ring-blue-400"
+                    required
+                  />
+                  <label className="block text-sm font-medium text-gray-300">
+                    Attendance (2023-12-24)
+                  </label>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Certificate Number
+                  </label>
+                  <input
+                    name="certificate_number"
+                    placeholder="Enter Certificate Number"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    name="taken_certificate"
+                    type="checkbox"
+                    className="w-4 h-4 bg-gray-700 border border-gray-600 text-blue-400 rounded focus:ring-2 focus:ring-blue-400"
+                    required
+                  />
+                  <label className="block text-sm font-medium text-gray-300">
+                    Taken Certificate
+                  </label>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Share Price
+                  </label>
+                  <input
+                    name="share_price"
+                    type="number"
+                    min="0"
+                    placeholder="0.00"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
               </div>
             </div>
 
@@ -527,51 +621,108 @@ export default function Index() {
                           </label>
                           <input
                             name="phone_2"
-                          defaultValue={shareholder.phone_2}
-                          className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">
-                          Email
-                        </label>
-                        <input
-                          name="email"
-                          defaultValue={shareholder.email}
-                          className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">
-                          Share Will
-                        </label>
-                        <input
-                          type="number"
-                          step="0.01"
-                          min="0"
-                          name="share_will"
-                          defaultValue={shareholder.share_will}
-                          className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                          required
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-medium text-gray-400 mb-1">
-                          Nationality
-                        </label>
-                        <input
-                          name="nationality"
-                          defaultValue={shareholder.nationality}
-                          className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                          required
-                        />
+                            defaultValue={shareholder.phone_2}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Email
+                          </label>
+                          <input
+                            name="email"
+                            defaultValue={shareholder.email}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Share Will
+                          </label>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            name="share_will"
+                            defaultValue={shareholder.share_will}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Nationality
+                          </label>
+                          <input
+                            name="nationality"
+                            defaultValue={shareholder.nationality}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Receipt Number
+                          </label>
+                          <input
+                            name="receipt_number"
+                            defaultValue={shareholder.receipt_number}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            required
+                          />
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            name="attendance"
+                            defaultChecked={shareholder.attendance}
+                            className="w-4 h-4 text-blue-400 border-gray-500 rounded focus:ring-2 focus:ring-blue-400"
+                          />
+                          <label className="text-sm font-medium text-gray-300">
+                            Attendance (2023-12-24)
+                          </label>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Certificate Number
+                          </label>
+                          <input
+                            name="certificate_number"
+                            defaultValue={shareholder.certificate_number}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          />
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            name="taken_certificate"
+                            defaultChecked={shareholder.taken_certificate}
+                            className="w-4 h-4 text-blue-400 border-gray-500 rounded focus:ring-2 focus:ring-blue-400"
+                          />
+                          <label className="text-sm font-medium text-gray-300">
+                            Taken Certificate
+                          </label>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Share Price
+                          </label>
+                          <input
+                            name="share_price"
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            defaultValue={shareholder.share_price}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            required
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  {/* Action Buttons */}
-                  <input
+                    {/* Action Buttons */}
+                    <input
                       type="hidden"
                       name="old_fn_id"
                       value={shareholder.fn_id}
