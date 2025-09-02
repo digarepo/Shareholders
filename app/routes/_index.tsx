@@ -55,6 +55,10 @@ export const action: ActionFunction = async ({
   const wereda = formData.get("wereda");
   const house_number = formData.get("house_number");
   const phone_1 = formData.get("phone_1");
+  const phone_2 = formData.get("phone_2");
+  const email = formData.get("email");
+  const share_will = formData.get("share_will");
+  const nationality = formData.get("nationality");
 
   // Handle different actions based on the intent
   if (intent === "create") {
@@ -83,6 +87,19 @@ export const action: ActionFunction = async ({
     if (!phone_1 || phone_1.toString().length === 0) {
       return json({ error: "Valid phone_1 is required" }, { status: 400 });
     }
+    if (!phone_2 || phone_2.toString().length === 0) {
+      return json({ error: "Valid phone_2 is required" }, { status: 400 });
+    }
+    if (!email || email.toString().length === 0) {
+      return json({ error: "Valid email is required" }, { status: 400 });
+    }
+    if (!share_will || isNaN(Number(share_will))) {
+      return json({ error: "Valid share_will is required" }, { status: 400 });
+    }
+    if (!nationality || nationality.toString().length === 0) {
+      return json({ error: "Valid nationality is required" }, { status: 400 });
+    }
+
     // Check for duplicate fn_id
     const existing = await query<Shareholder>(
       "SELECT * FROM shareholders WHERE fn_id = ?",
@@ -103,12 +120,16 @@ export const action: ActionFunction = async ({
         wereda?.toString().trim(),
         house_number?.toString().trim(),
         phone_1?.toString().trim(),
+        phone_2?.toString().trim(),
+        email?.toString().trim(),
+        share_will?.toString().trim(),
+        nationality?.toString().trim()
       ]
     );
   } else if (intent === "update") {
     // Update an existing shareholder
     await query(
-      "UPDATE shareholders SET fn_id = ?, name_amharic = ?, name_english = ?, city = ?, subcity = ?, wereda = ?, house_number = ?, phone_1 = ? WHERE fn_id = ?",
+      "UPDATE shareholders SET fn_id = ?, name_amharic = ?, name_english = ?, city = ?, subcity = ?, wereda = ?, house_number = ?, phone_1 = ?, phone_2 = ?, email = ?, share_will = ?, nationality = ? WHERE fn_id = ?",
       [
         fn_id as string,
         name_amharic as string,
@@ -118,6 +139,10 @@ export const action: ActionFunction = async ({
         wereda as string,
         house_number as string,
         phone_1 as string,
+        phone_2 as string,
+        email as string,
+        share_will as string,
+        nationality as string,
         old_fn_id as string,
       ]
     );
@@ -279,6 +304,53 @@ export default function Index() {
                   <input
                     name="phone_1"
                     placeholder="Enter Phone 1"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Phone 2
+                  </label>
+                  <input
+                    name="phone_2"
+                    placeholder="Enter Phone 2"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Email
+                  </label>
+                  <input
+                    name="email"
+                    placeholder="Enter Email"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Share Will
+                  </label>
+                  <input
+                    name="share_will"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder="0.00"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Nationality
+                  </label>
+                  <input
+                    name="nationality"
+                    placeholder="Enter Nationality"
                     className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                     required
                   />
@@ -449,10 +521,57 @@ export default function Index() {
                             required
                           />
                         </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Phone Number-2
+                          </label>
+                          <input
+                            name="phone_2"
+                          defaultValue={shareholder.phone_2}
+                          className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">
+                          Email
+                        </label>
+                        <input
+                          name="email"
+                          defaultValue={shareholder.email}
+                          className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">
+                          Share Will
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          name="share_will"
+                          defaultValue={shareholder.share_will}
+                          className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-gray-400 mb-1">
+                          Nationality
+                        </label>
+                        <input
+                          name="nationality"
+                          defaultValue={shareholder.nationality}
+                          className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          required
+                        />
                       </div>
                     </div>
-                    {/* Action Buttons */}
-                    <input
+                  </div>
+                  {/* Action Buttons */}
+                  <input
                       type="hidden"
                       name="old_fn_id"
                       value={shareholder.fn_id}

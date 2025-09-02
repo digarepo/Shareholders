@@ -7,5 +7,9 @@ CREATE TABLE IF NOT EXISTS shareholders (
     wereda VARCHAR(100) NOT NULL,
     house_number VARCHAR(100) NOT NULL,
     phone_1 VARCHAR(15) NOT NULL,
+    phone_2 VARCHAR(15) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    share_will DOUBLE NOT NULL,
+    nationality VARCHAR(100) NOT NULL,
     PRIMARY KEY (fn_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

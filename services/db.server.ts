@@ -55,6 +55,10 @@ export interface Shareholder {
   wereda: string;
   house_number: string;
   phone_1: string;
+  phone_2: string;
+  email: string;
+  share_will: number;
+  nationality: string;
 }
 
 // Example usage with proper typing:
