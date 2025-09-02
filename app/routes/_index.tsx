@@ -125,6 +125,24 @@ export const action: ActionFunction = async ({
     if (!share_price || isNaN(Number(share_price))) {
       return json({ error: "Valid share_price is required" }, { status: 400 });
     }
+    if (!error_share || error_share.toString().length === 0) {
+      return json({ error: "Valid error_share is required" }, { status: 400 });
+    }
+    if (!error_form || error_form.toString().length === 0) {
+      return json({ error: "Valid error_form is required" }, { status: 400 });
+    }
+    if (!error_bank_slip || error_bank_slip.toString().length === 0) {
+      return json({ error: "Valid error_bank_slip is required" }, { status: 400 });
+    }
+    if (!comment_medina || comment_medina.toString().length === 0) {
+      return json({ error: "Valid comment_medina is required" }, { status: 400 });
+    }
+    if (!general_comment || general_comment.toString().length === 0) {
+      return json({ error: "Valid general_comment is required" }, { status: 400 });
+    }
+    if (!version || isNaN(Number(version))) {
+      return json({ error: "Valid version is required" }, { status: 400 });
+    }
 
     // Check for duplicate fn_id
     const existing = await query<Shareholder>(
@@ -136,7 +154,7 @@ export const action: ActionFunction = async ({
     }
 
     await query(
-      "INSERT INTO shareholders (fn_id, name_amharic, name_english, city, subcity, wereda, house_number, phone_1, phone_2, email, share_will, nationality, receipt_number, attendance_2023_dec_24, certificate_number, taken_certificate, share_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO shareholders (fn_id, name_amharic, name_english, city, subcity, wereda, house_number, phone_1, phone_2, email, share_will, nationality, receipt_number, attendance_2023_dec_24, certificate_number, taken_certificate, share_price, error_share, error_form, error_bank_slip, comment_medina, general_comment, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         fn_id?.toString().trim(),
         name_amharic?.toString().trim(),
@@ -155,12 +173,18 @@ export const action: ActionFunction = async ({
         certificate_number?.toString().trim(),
         taken_certificate?.toString().trim(),
         share_price?.toString().trim(),
+        error_share?.toString().trim(),
+        error_form?.toString().trim(),
+        error_bank_slip?.toString().trim(),
+        comment_medina?.toString().trim(),
+        general_comment?.toString().trim(),
+        version?.toString().trim(),
       ]
     );
   } else if (intent === "update") {
     // Update an existing shareholder
     await query(
-      "UPDATE shareholders SET fn_id = ?, name_amharic = ?, name_english = ?, city = ?, subcity = ?, wereda = ?, house_number = ?, phone_1 = ?, phone_2 = ?, email = ?, share_will = ?, nationality = ?, receipt_number = ?, attendance_2023_dec_24 = ?, certificate_number = ?, taken_certificate = ?, share_price = ? WHERE fn_id = ?",
+      "UPDATE shareholders SET fn_id = ?, name_amharic = ?, name_english = ?, city = ?, subcity = ?, wereda = ?, house_number = ?, phone_1 = ?, phone_2 = ?, email = ?, share_will = ?, nationality = ?, receipt_number = ?, attendance_2023_dec_24 = ?, certificate_number = ?, taken_certificate = ?, share_price = ?, error_share = ?, error_form = ?, error_bank_slip = ?, comment_medina = ?, general_comment = ?, version = ? WHERE fn_id = ?",
       [
         fn_id as string,
         name_amharic as string,
@@ -179,6 +203,12 @@ export const action: ActionFunction = async ({
         certificate_number as string,
         taken_certificate as string,
         share_price as string,
+        error_share as string,
+        error_form as string,
+        error_bank_slip as string,
+        comment_medina as string,
+        general_comment as string,
+        version as string,
         old_fn_id as string,
       ]
     );
@@ -444,9 +474,80 @@ export default function Index() {
                     name="share_price"
                     type="number"
                     min="0"
+                    step="0.01"
                     placeholder="0.00"
                     className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                     required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Error Share
+                  </label>
+                  <input
+                    name="error_share"
+                    placeholder="Enter Error Share"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                   
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Error Form
+                  </label>
+                  <input
+                    name="error_form"
+                    placeholder="Enter Error Form"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Error Bank Slip
+                  </label>
+                  <input
+                    name="error_bank_slip"
+                    placeholder="Enter Error Bank Slip"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                   
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Version
+                  </label>
+                  <input
+                    name="version"
+                    type="number"
+                    min="0"
+                    placeholder="Enter Version"
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Comment Medina
+                  </label>
+                  <textarea
+                    name="comment_medina"
+                    placeholder="Enter Comment Medina"
+                    rows={4}
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                    
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    General Comment
+                  </label>
+                  <textarea
+                    name="general_comment"
+                    placeholder="Enter General Comment"
+                    rows={4}
+                    className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                   
                   />
                 </div>
               </div>
@@ -717,6 +818,70 @@ export default function Index() {
                             defaultValue={shareholder.share_price}
                             className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                             required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Error Share
+                          </label>
+                          <input
+                            name="error_share"
+                            defaultValue={shareholder.error_share}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Error Form
+                          </label>
+                          <input
+                            name="error_form"
+                            defaultValue={shareholder.error_form}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Error Bank Slip
+                          </label>
+                          <input
+                            name="error_bank_slip"
+                            defaultValue={shareholder.error_bank_slip}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Version
+                          </label>
+                          <input
+                            name="version"
+                            type="number"
+                            min="0"
+                            defaultValue={shareholder.version}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            Comment Medina
+                          </label>
+                          <textarea
+                            name="comment_medina"
+                            rows={4}
+                            defaultValue={shareholder.comment_medina}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                            General Comment
+                          </label>
+                          <textarea
+                            name="general_comment"
+                            rows={4}
+                            defaultValue={shareholder.general_comment}
+                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                           />
                         </div>
                       </div>
