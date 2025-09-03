@@ -60,9 +60,9 @@ export const action: ActionFunction = async ({
   const share_will = formData.get("share_will");
   const nationality = formData.get("nationality");
   const receipt_number = formData.get("receipt_number");
-  const attendance_2023_dec_24 = formData.get("attendance_2023_dec_24");
+  const attendance_2023_dec_24 = formData.get("attendance_2023_dec_24") === "true";
   const certificate_number = formData.get("certificate_number");
-  const taken_certificate = formData.get("taken_certificate");
+  const taken_certificate = formData.get("taken_certificate") === "true";
   const share_price = formData.get("share_price");
   const error_share = formData.get("error_share");
   const error_form = formData.get("error_form");
@@ -113,32 +113,11 @@ export const action: ActionFunction = async ({
     if (!receipt_number || receipt_number.toString().length === 0) {
       return json({ error: "Valid receipt_number is required" }, { status: 400 });
     }
-    if (!attendance_2023_dec_24 || isNaN(Number(attendance_2023_dec_24))) {
-      return json({ error: "Valid attendance_2023_dec_24 is required" }, { status: 400 });
-    }
     if (!certificate_number || certificate_number.toString().length === 0) {
       return json({ error: "Valid certificate_number is required" }, { status: 400 });
     }
-    if (!taken_certificate || isNaN(Number(taken_certificate))) {
-      return json({ error: "Valid taken_certificate is required" }, { status: 400 });
-    }
     if (!share_price || isNaN(Number(share_price))) {
       return json({ error: "Valid share_price is required" }, { status: 400 });
-    }
-    if (!error_share || error_share.toString().length === 0) {
-      return json({ error: "Valid error_share is required" }, { status: 400 });
-    }
-    if (!error_form || error_form.toString().length === 0) {
-      return json({ error: "Valid error_form is required" }, { status: 400 });
-    }
-    if (!error_bank_slip || error_bank_slip.toString().length === 0) {
-      return json({ error: "Valid error_bank_slip is required" }, { status: 400 });
-    }
-    if (!comment_medina || comment_medina.toString().length === 0) {
-      return json({ error: "Valid comment_medina is required" }, { status: 400 });
-    }
-    if (!general_comment || general_comment.toString().length === 0) {
-      return json({ error: "Valid general_comment is required" }, { status: 400 });
     }
     if (!version || isNaN(Number(version))) {
       return json({ error: "Valid version is required" }, { status: 400 });
@@ -154,7 +133,7 @@ export const action: ActionFunction = async ({
     }
 
     await query(
-      "INSERT INTO shareholders (fn_id, name_amharic, name_english, city, subcity, wereda, house_number, phone_1, phone_2, email, share_will, nationality, receipt_number, attendance_2023_dec_24, certificate_number, taken_certificate, share_price, error_share, error_form, error_bank_slip, comment_medina, general_comment, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+      "INSERT INTO shareholders (fn_id, name_amharic, name_english, city, subcity, wereda, house_number, phone_1, phone_2, email, share_will, nationality, receipt_number, attendance_2023_dec_24, certificate_number, taken_certificate, share_price, error_share, error_form, error_bank_slip, comment_medina, general_comment, version) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         fn_id?.toString().trim(),
         name_amharic?.toString().trim(),
@@ -169,9 +148,9 @@ export const action: ActionFunction = async ({
         share_will?.toString().trim(),
         nationality?.toString().trim(),
         receipt_number?.toString().trim(),
-        attendance_2023_dec_24?.toString().trim(),
+        attendance_2023_dec_24 === true ? 1 : 0,
         certificate_number?.toString().trim(),
-        taken_certificate?.toString().trim(),
+        taken_certificate === true ? 1 : 0,
         share_price?.toString().trim(),
         error_share?.toString().trim(),
         error_form?.toString().trim(),
@@ -199,9 +178,9 @@ export const action: ActionFunction = async ({
         share_will as string,
         nationality as string,
         receipt_number as string,
-        attendance_2023_dec_24 as string,
+        attendance_2023_dec_24 === true ? 1 : 0,
         certificate_number as string,
-        taken_certificate as string,
+        taken_certificate === true ? 1 : 0,
         share_price as string,
         error_share as string,
         error_form as string,
@@ -218,7 +197,9 @@ export const action: ActionFunction = async ({
     if (!old_fn_id) {
       return json({ error: "Missing original FN ID" }, { status: 400 });
     }
-    await query("DELETE FROM shareholders WHERE fn_id = ?", [old_fn_id as string]);
+    await query("DELETE FROM shareholders WHERE fn_id = ?", [
+      old_fn_id as string,
+    ]);
   }
 
   // Return a success response
@@ -432,18 +413,20 @@ export default function Index() {
                     required
                   />
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center space-x-2 mt-4">
                   <input
-                    name="attendance_2023_dec_24"
                     type="checkbox"
-                    className="w-4 h-4 bg-gray-700 border border-gray-600 text-blue-400 rounded focus:ring-2 focus:ring-blue-400"
-                    required
+                    name="attendance_2023_dec_24"
+                    id="attendance_2023_dec_24"
+                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <label className="block text-sm font-medium text-gray-300">
-                    Attendance (2023-12-24)
+                  <label
+                    htmlFor="attendance_2023_dec_24"
+                    className="block text-sm font-medium text-gray-300"
+                  >
+                    Attended on 2023-12-24
                   </label>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-300 mb-2">
                     Certificate Number
@@ -455,14 +438,17 @@ export default function Index() {
                     required
                   />
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center space-x-2 mt-4">
                   <input
-                    name="taken_certificate"
                     type="checkbox"
-                    className="w-4 h-4 bg-gray-700 border border-gray-600 text-blue-400 rounded focus:ring-2 focus:ring-blue-400"
-                    required
+                    name="taken_certificate"
+                    id="taken_certificate"
+                    className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                   />
-                  <label className="block text-sm font-medium text-gray-300">
+                  <label
+                    htmlFor="taken_certificate"
+                    className="block text-sm font-medium text-gray-300"
+                  >
                     Taken Certificate
                   </label>
                 </div>
@@ -473,9 +459,8 @@ export default function Index() {
                   <input
                     name="share_price"
                     type="number"
-                    min="0"
                     step="0.01"
-                    placeholder="0.00"
+                    placeholder="Enter Share Price"
                     className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                     required
                   />
@@ -488,7 +473,6 @@ export default function Index() {
                     name="error_share"
                     placeholder="Enter Error Share"
                     className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                   
                   />
                 </div>
                 <div>
@@ -499,7 +483,6 @@ export default function Index() {
                     name="error_form"
                     placeholder="Enter Error Form"
                     className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                
                   />
                 </div>
                 <div>
@@ -510,7 +493,6 @@ export default function Index() {
                     name="error_bank_slip"
                     placeholder="Enter Error Bank Slip"
                     className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                   
                   />
                 </div>
                 <div>
@@ -520,10 +502,9 @@ export default function Index() {
                   <input
                     name="version"
                     type="number"
-                    min="0"
                     placeholder="Enter Version"
                     className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                    
+                    required
                   />
                 </div>
                 <div>
@@ -532,10 +513,9 @@ export default function Index() {
                   </label>
                   <textarea
                     name="comment_medina"
-                    placeholder="Enter Comment Medina"
                     rows={4}
+                    placeholder="Enter Comment Medina"
                     className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                    
                   />
                 </div>
                 <div>
@@ -544,10 +524,9 @@ export default function Index() {
                   </label>
                   <textarea
                     name="general_comment"
-                    placeholder="Enter General Comment"
                     rows={4}
+                    placeholder="Enter General Comment"
                     className="w-full p-3 bg-gray-700 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                   
                   />
                 </div>
               </div>
@@ -774,15 +753,20 @@ export default function Index() {
                             required
                           />
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center space-x-2 mt-4">
                           <input
                             type="checkbox"
-                            name="attendance"
-                            defaultChecked={shareholder.attendance}
-                            className="w-4 h-4 text-blue-400 border-gray-500 rounded focus:ring-2 focus:ring-blue-400"
+                            name="attendance_2023_dec_24"
+                            id="attendance_2023_dec_24"
+                            defaultChecked={shareholder.attendance_2023_dec_24}
+
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                           />
-                          <label className="text-sm font-medium text-gray-300">
-                            Attendance (2023-12-24)
+                          <label
+                            htmlFor="attendance_2023_dec_24"
+                            className="block text-sm font-medium text-gray-300"
+                          >
+                            Attended on 2023-12-24
                           </label>
                         </div>
                         <div>
@@ -793,27 +777,32 @@ export default function Index() {
                             name="certificate_number"
                             defaultValue={shareholder.certificate_number}
                             className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            required
                           />
                         </div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center space-x-2 mt-4">
                           <input
+                            defaultChecked={shareholder.taken_certificate}
+                            
                             type="checkbox"
                             name="taken_certificate"
-                            defaultChecked={shareholder.taken_certificate}
-                            className="w-4 h-4 text-blue-400 border-gray-500 rounded focus:ring-2 focus:ring-blue-400"
+                            id="taken_certificate"
+                            className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                           />
-                          <label className="text-sm font-medium text-gray-300">
+                          <label
+                            htmlFor="taken_certificate"
+                            className="block text-sm font-medium text-gray-300"
+                          >
                             Taken Certificate
                           </label>
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
                             Share Price
                           </label>
                           <input
                             name="share_price"
                             type="number"
-                            min="0"
                             step="0.01"
                             defaultValue={shareholder.share_price}
                             className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
@@ -821,17 +810,18 @@ export default function Index() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
                             Error Share
                           </label>
                           <input
                             name="error_share"
                             defaultValue={shareholder.error_share}
                             className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
                             Error Form
                           </label>
                           <input
@@ -841,7 +831,7 @@ export default function Index() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
                             Error Bank Slip
                           </label>
                           <input
@@ -851,7 +841,7 @@ export default function Index() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
                             Version
                           </label>
                           <input
@@ -863,25 +853,25 @@ export default function Index() {
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
                             Comment Medina
                           </label>
                           <textarea
                             name="comment_medina"
                             rows={4}
                             defaultValue={shareholder.comment_medina}
-                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            className="w-full p-3 bg-gray-600 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-medium text-gray-400 mb-1">
+                          <label className="block text-sm font-medium text-gray-300 mb-2">
                             General Comment
                           </label>
                           <textarea
                             name="general_comment"
                             rows={4}
                             defaultValue={shareholder.general_comment}
-                            className="w-full p-2 text-sm bg-gray-600 border border-gray-500 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
+                            className="w-full p-3 bg-gray-600 border border-gray-600 text-white rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                           />
                         </div>
                       </div>
